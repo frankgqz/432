@@ -1,5 +1,11 @@
 # 432 — the driver's music player (Frank's music/uber/432 app)
 
+ The workspace (Frank's folder convention, 2026-11-18): `432/repo/` = the
+ git home = THIS folder (the code + this file travel together); `432/music/`
+ = the master shelf, outside git by construction. The vocabulary: `repo` =
+ the pure git home one folder down · `source` = the code folder when git
+ sits at the project root (origin rejected — git's own remote word).
+
  A PWA that plays music at A=432 in the car. Roadmap = Frank's own
  `⌁ docs/projects/Ϟ music.md` (9 lines: playable while driving · installable ·
  ±key/±bpm/432 toggle · YouTube playlists · 440→432 conversion · detect ·

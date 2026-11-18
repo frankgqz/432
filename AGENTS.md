@@ -45,6 +45,13 @@
 - No service worker yet = the PWA installs but needs the network for the
  shell; audio is all local. SW caching = next polish.
 
+## Hosting (Frank's call, 2026-11-18)
+- Cloudflare (Workers-static), NOT Vercel: the infra line he already pays,
+ the DNS is Cloudflare-native, and `npx wrangler deploy` never lags behind a
+ webhook. Deploy = Frank's shell: `cd C:\Code\craft\432\repo && npm run deploy`.
+ Domain = Custom Domains tab -> 432.gqz.app (writes the record + cert).
+ Verify the DEPLOYED artifact after (the deployed-state law).
+
 ## Open threads
 → PWA icons (the manifest's icons array is empty = install prompt is weak).
 → The YouTube playlist tab (rate-trick only).

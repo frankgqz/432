@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && npx wrangler deploy"
+    "deploy": "npm run build && npx wrangler deploy",
+    "prebuild": "node scripts/ensure-natives.mjs"
   },
   "dependencies": {
     "@soundtouchjs/audio-worklet": "^2.1.1",

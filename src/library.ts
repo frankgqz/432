@@ -1,0 +1,49 @@
+// The library: ~30 favourites, kept as blobs in IndexedDB so the installed
+// app survives reloads (Frank 2026-11-18: "a handful of favourites").
+export interface Track {
+  id: string;
+  name: string;
+  blob: Blob;
+}
+
+const DB = "432", STORE = "tracks";
+
+function openDb(): Promise<IDBDatabase> {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open(DB, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(STORE, { keyPath: "id" });
+    req.onsuccess = () => res(req.result);
+    req.onerror = () => rej(req.error);
+  });
+}
+
+export async function allTracks(): Promise<Track[]> {
+  const db = await openDb();
+  return new Promise((res, rej) => {
+    const req = db.transaction(STORE).objectStore(STORE).getAll();
+    req.onsuccess = () => {
+      const rows = (req.result as Track[]).sort((a, b) => a.name.localeCompare(b.name));
+      res(rows);
+    };
+    req.onerror = () => rej(req.error);
+  });
+}
+
+export async function addTrack(name: string, blob: Blob): Promise<Track> {
+  const track: Track = { id: crypto.randomUUID(), name, blob };
+  const db = await openDb();
+  return new Promise((res, rej) => {
+    const req = db.transaction(STORE, "readwrite").objectStore(STORE).add(track);
+    req.onsuccess = () => res(track);
+    req.onerror = () => rej(req.error);
+  });
+}
+
+export async function removeTrack(id: string): Promise<void> {
+  const db = await openDb();
+  return new Promise((res, rej) => {
+    const req = db.transaction(STORE, "readwrite").objectStore(STORE).delete(id);
+    req.onsuccess = () => res();
+    req.onerror = () => rej(req.error);
+  });
+}

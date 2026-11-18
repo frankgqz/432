@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#0b0b0e" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <title>432</title>
+  </head>
+  <body>
+    <div id="app">
+      <button id="t432" class="hero" aria-pressed="true">432</button>
+
+      <div id="now">
+        <div id="title">nothing playing</div>
+        <div id="bar"><div id="fill"></div></div>
+      </div>
+
+      <div class="knobs">
+        <div class="knob">
+          <button id="keyDown" class="step">−</button>
+          <div class="readout"><span class="micro">KEY</span><span id="keyVal">0</span></div>
+          <button id="keyUp" class="step">+</button>
+        </div>
+        <div class="knob">
+          <button id="bpmDown" class="step">−</button>
+          <div class="readout"><span class="micro">BPM</span><span id="bpmVal">100%</span></div>
+          <button id="bpmUp" class="step">+</button>
+        </div>
+      </div>
+
+      <div class="transport">
+        <button id="prev" class="tbtn" aria-label="previous">&#9198;</button>
+        <button id="play" class="tbtn big" aria-label="play/pause">&#9654;</button>
+        <button id="next" class="tbtn" aria-label="next">&#9197;</button>
+      </div>
+
+      <div class="libhead">
+        <span class="micro">LIBRARY</span>
+        <button id="import" class="mini">+ import</button>
+        <input id="fileInput" type="file" accept="audio/*" multiple hidden />
+      </div>
+      <ul id="list"></ul>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

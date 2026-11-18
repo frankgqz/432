@@ -1,0 +1,10 @@
+{
+  "name": "432",
+  "short_name": "432",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0b0e",
+  "theme_color": "#0b0b0e",
+  "icons": []
+}

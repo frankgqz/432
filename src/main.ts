@@ -1,6 +1,7 @@
 import "./style.css";
 import { Engine } from "./audio";
 import { allTracks, addTrack, type Track } from "./library";
+import { analyzeTuningFromBuffer, tuningLabel } from "./tuning";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const engine = new Engine();
@@ -16,6 +17,12 @@ async function refreshList(): Promise<void> {
   tracks.forEach((t, i) => {
     const li = document.createElement("li");
     li.textContent = t.name.replace(/\.[a-z0-9]+$/i, "");
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    const tun = t.tuningConfidence != null ? { cents: t.tuningCents ?? 0, confidence: t.tuningConfidence } : undefined;
+    badge.textContent = tuningLabel(tun);
+    if (badge.textContent === "432") badge.classList.add("hot");
+    li.appendChild(badge);
     if (i === index) li.classList.add("active");
     li.onclick = () => void playIndex(i);
     list.appendChild(li);
@@ -28,6 +35,7 @@ async function playIndex(i: number, viaSwap = true): Promise<void> {
   const start = async () => {
     index = i;
     await engine.load(tracks[i].blob);
+    engine.setTrackCents(tracks[i].tuningCents ?? null);
     $("title").textContent = tracks[i].name.replace(/\.[a-z0-9]+$/i, "");
     setMedia();
   };
@@ -94,7 +102,16 @@ $("import").onclick = () => $("fileInput").click();
 ($("fileInput") as HTMLInputElement).onchange = async (e) => {
   const files = (e.target as HTMLInputElement).files;
   if (!files) return;
-  for (const f of files) await addTrack(f.name, f);
+  for (const f of files) {
+    // the tuning vote happens once, at import (roadmap #6)
+    let tuning: { cents: number; confidence: number } | null = null;
+    try {
+      const ctx = new OfflineAudioContext(1, 1, 44100);
+      const buf = await ctx.decodeAudioData(await f.arrayBuffer());
+      tuning = analyzeTuningFromBuffer(buf);
+    } catch { /* undecodable stays unanalyzed */ }
+    await addTrack(f.name, f, tuning);
+  }
   await refreshList();
   ($("fileInput") as HTMLInputElement).value = "";
 };

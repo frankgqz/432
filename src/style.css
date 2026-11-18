@@ -99,3 +99,12 @@ body {
 }
 #list li.active { background: #17171d; font-weight: 700; }
 #list li:active { background: #1d1d25; }
+.badge {
+  float: right;
+  margin-left: 10px;
+  font-size: 10px;
+  color: #6b6b78;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+}
+.badge.hot { color: #ececf1; }

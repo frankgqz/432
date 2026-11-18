@@ -4,6 +4,8 @@ export interface Track {
   id: string;
   name: string;
   blob: Blob;
+  tuningCents?: number | null;  // the source's detected tuning (null = unknown)
+  tuningConfidence?: number;
 }
 
 const DB = "432", STORE = "tracks";
@@ -29,8 +31,12 @@ export async function allTracks(): Promise<Track[]> {
   });
 }
 
-export async function addTrack(name: string, blob: Blob): Promise<Track> {
-  const track: Track = { id: crypto.randomUUID(), name, blob };
+export async function addTrack(name: string, blob: Blob, tuning?: { cents: number; confidence: number } | null): Promise<Track> {
+  const track: Track = {
+    id: crypto.randomUUID(), name, blob,
+    tuningCents: tuning ? tuning.cents : null,
+    tuningConfidence: tuning ? tuning.confidence : undefined,
+  };
   const db = await openDb();
   return new Promise((res, rej) => {
     const req = db.transaction(STORE, "readwrite").objectStore(STORE).add(track);

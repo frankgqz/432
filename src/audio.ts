@@ -19,6 +19,7 @@ export class Engine {
   playing = false;
   keySemis = 0;
   is432 = true;
+  trackCents: number | null = null; // the source's detected tuning (null = assume 440)
   tempo = 1;
   onEnded: (() => void) | null = null;
 
@@ -53,7 +54,9 @@ export class Engine {
 
   private applyTuning(): void {
     if (!this.node) return;
-    const cents = this.keySemis * 100 + (this.is432 ? CENTS_432 : 0);
+    // auto-432 (roadmap #7): a 432 source shifts 0, a 442 source shifts
+    // -39.8c, an unknown source assumes 440 and shifts -31.766c
+    const cents = this.keySemis * 100 + (this.is432 ? CENTS_432 - (this.trackCents ?? 0) : 0);
     this.node.pitch.value = Math.pow(2, cents / 1200);
     this.node.playbackRate.value = this.tempo;
   }
@@ -122,5 +125,6 @@ export class Engine {
     if (this.src) this.src.playbackRate.value = this.tempo;
     this.applyTuning();
   }
+  setTrackCents(c: number | null): void { this.trackCents = c; this.applyTuning(); }
   set432(on: boolean): void { this.is432 = on; this.applyTuning(); }
 }

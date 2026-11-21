@@ -1,6 +1,6 @@
 import "./style.css";
 import { Engine } from "./audio";
-import { allTracks, addTrack, type Track } from "./library";
+import { allTracks, addTrack, removeTrack, type Track } from "./library";
 import { analyzeTuningFromBuffer, tuningLabel } from "./tuning";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
@@ -24,7 +24,28 @@ async function refreshList(): Promise<void> {
     if (badge.textContent === "432") badge.classList.add("hot");
     li.appendChild(badge);
     if (i === index) li.classList.add("active");
-    li.onclick = () => void playIndex(i);
+    // long-press = remove (the phone idiom; a deliberate press, safe from
+    // driver fumbles — Frank 2026-11-21: the delete affordance was missing)
+    let pressTimer = 0;
+    let longFired = false;
+    li.onpointerdown = () => {
+      longFired = false;
+      pressTimer = window.setTimeout(() => {
+        longFired = true;
+        if (confirm(`Remove "${t.name.replace(/\.[a-z0-9]+$/i, "")}" from this device?`)) {
+          void removeTrack(t.id).then(() => refreshList());
+        }
+      }, 550);
+    };
+    const cancelPress = () => clearTimeout(pressTimer);
+    li.onpointerup = cancelPress;
+    li.onpointercancel = cancelPress;
+    li.onpointerleave = cancelPress;
+    li.oncontextmenu = (e) => e.preventDefault();
+    li.onclick = () => {
+      if (longFired) { longFired = false; return; }
+      void playIndex(i);
+    };
     list.appendChild(li);
   });
 }

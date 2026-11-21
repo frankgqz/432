@@ -37,6 +37,13 @@
  "fade in out" reads as dip, not overlap; overlap = later if wanted.
 - The AudioContext is created on first gesture (mobile autoplay rules).
 
+## Where the music lives (the storage truth)
+- Imported tracks = browser **IndexedDB** (db "432", store "tracks") = a COPY
+ per browser, per device. Importing on the PC does NOT reach the phone —
+ each device imports its own library (music/ = the master shelf on disk).
+- Remove = LONG-PRESS a row (550ms) -> confirm -> gone from that device's
+ library. music/ on disk is never touched by the app.
+
 ## Known limits (honest, by design)
 - YouTube tab: a PWA cannot pipe YT audio through the engine (cross-origin) —
  the YT player can only get the RATE trick (coupled tempo). Local files get

@@ -84,9 +84,20 @@ function fmtBpm(): string { return Math.round(engine.tempo * 100) + "%"; }
 
 // ---------- progress (tap the bar to seek) ----------
 const fill = $("fill") as HTMLDivElement;
+const elapsedEl = $("elapsed");
+const leftEl = $("left");
+function fmtTime(s: number): string {
+  if (!isFinite(s) || s < 0) s = 0;
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return m + ":" + String(sec).padStart(2, "0");
+}
 function tick(): void {
   const d = engine.duration;
-  fill.style.width = d ? (engine.position / d) * 100 + "%" : "0%";
+  const pos = engine.position;
+  fill.style.width = d ? (pos / d) * 100 + "%" : "0%";
+  elapsedEl.textContent = fmtTime(pos);
+  leftEl.textContent = "\u2212" + (d ? fmtTime(d - pos) : "0:00");
   requestAnimationFrame(tick);
 }
 requestAnimationFrame(tick);

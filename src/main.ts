@@ -62,7 +62,7 @@ async function playIndex(i: number, viaSwap = true): Promise<void> {
     // decode is already done at play time, so vote now and save it (Frank
     // 2026-11-21: old "?" badges read as "the feature is missing")
     const cur = tracks[i];
-    if (cur.tuningConfidence == null) {
+    if (cur.tuningConfidence == null || cur.tuningConfidence <= 0.20) {
       try {
         const tun = analyzeTuningFromBuffer(engine.bufferForAnalysis());
         cur.tuningCents = tun.cents;

@@ -92,8 +92,8 @@ export function analyzeTuning(samples: Float32Array, sampleRate: number, maxFram
       const residual = midi - Math.round(midi); // the off-grid part
       const c2 = Math.round(residual * 100);
       const bin = (((c2 + 50) % 100) + 100) % 100; // wrap to [-50, 50)
-      hist[bin] += m;
-      total += m;
+      hist[bin] += m * m; // m^2: loud fundamentals outvote stray percussion
+      total += m * m;
     }
   }
 
@@ -110,7 +110,7 @@ export function analyzeTuning(samples: Float32Array, sampleRate: number, maxFram
   for (let i = 1; i < 100; i++) if (smooth[i] > smooth[best]) best = i;
 
   let near = 0;
-  for (let d = -2; d <= 2; d++) near += hist[(((best + d) % 100) + 100) % 100];
+  for (let d = -5; d <= 5; d++) near += hist[(((best + d) % 100) + 100) % 100];
   return { cents: best - 50, confidence: near / total };
 }
 
@@ -128,7 +128,7 @@ export function analyzeTuningFromBuffer(buffer: AudioBuffer): Tuning {
 
 // the human-readable verdict for a track badge
 export function tuningLabel(t: Tuning | null | undefined): string {
-  if (!t || t.confidence <= 0.25) return "?"; // songs vote 0.97+, noise 0.11
+  if (!t || t.confidence <= 0.20) return "?"; // +-5c window: songs vote 0.6+, noise ~0.11
   if (Math.abs(t.cents - (-31.766)) <= 4) return "432";
   if (Math.abs(t.cents) <= 4) return "440";
   return (t.cents > 0 ? "+" : "") + t.cents + "c";

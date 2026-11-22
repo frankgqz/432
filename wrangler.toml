@@ -3,3 +3,9 @@ compatibility_date = "2026-11-01"
 
 [assets]
 directory = "./dist"
+
+# the Custom Domains flow via config (NOT a plain route): the deploy creates
+# the domain binding, the DNS record, and the cert in one move
+routes = [
+  { pattern = "432.gqz.app", custom_domain = true }
+]

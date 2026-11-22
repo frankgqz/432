@@ -45,6 +45,25 @@ export async function addTrack(name: string, blob: Blob, tuning?: { cents: numbe
   });
 }
 
+export async function updateTuning(id: string, tuning: { cents: number; confidence: number }): Promise<void> {
+  const db = await openDb();
+  return new Promise((res, rej) => {
+    const tx = db.transaction(STORE, "readwrite");
+    const store = tx.objectStore(STORE);
+    const get = store.get(id);
+    get.onsuccess = () => {
+      const row = get.result as Track | undefined;
+      if (row) {
+        row.tuningCents = tuning.cents;
+        row.tuningConfidence = tuning.confidence;
+        store.put(row);
+      }
+    };
+    tx.oncomplete = () => res();
+    tx.onerror = () => rej(tx.error);
+  });
+}
+
 export async function removeTrack(id: string): Promise<void> {
   const db = await openDb();
   return new Promise((res, rej) => {

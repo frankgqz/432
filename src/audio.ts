@@ -46,6 +46,12 @@ export class Engine {
 
   get duration(): number { return this.buffer?.duration ?? 0; }
 
+  // the decoded buffer, for the tuning vote at play time
+  bufferForAnalysis(): AudioBuffer {
+    if (!this.buffer) throw new Error("nothing loaded");
+    return this.buffer;
+  }
+
   get position(): number {
     if (!this.ctx || !this.buffer) return 0;
     const wall = this.playing ? this.ctx.currentTime - this.startedAt : 0;

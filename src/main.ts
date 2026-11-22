@@ -2,6 +2,7 @@ import "./style.css";
 import { Engine } from "./audio";
 import { allTracks, addTrack, removeTrack, type Track } from "./library";
 import { analyzeTuningFromBuffer, tuningLabel } from "./tuning";
+import { updateTuning } from "./library";
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const engine = new Engine();
@@ -57,6 +58,20 @@ async function playIndex(i: number, viaSwap = true): Promise<void> {
     index = i;
     await engine.load(tracks[i].blob);
     engine.setTrackCents(tracks[i].tuningCents ?? null);
+    // tracks imported before the detector existed carry no verdict — the
+    // decode is already done at play time, so vote now and save it (Frank
+    // 2026-11-21: old "?" badges read as "the feature is missing")
+    const cur = tracks[i];
+    if (cur.tuningConfidence == null) {
+      try {
+        const tun = analyzeTuningFromBuffer(engine.bufferForAnalysis());
+        cur.tuningCents = tun.cents;
+        cur.tuningConfidence = tun.confidence;
+        engine.setTrackCents(cur.tuningCents);
+        void updateTuning(cur.id, tun);
+        void refreshList(); // the badge flips from ? to the verdict
+      } catch { /* keep the ? */ }
+    }
     $("title").textContent = tracks[i].name.replace(/\.[a-z0-9]+$/i, "");
     setMedia();
   };
